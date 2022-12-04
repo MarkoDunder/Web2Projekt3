@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let pieces=[];
+        var myGamePiece;
+        let destroyed = 0;
+        let numOfComponents = Math.floor(Math.random() * (7 - 1)) + 1;
+        const startingNumber= numOfComponents;
+        function startGame() {
+            
+            
+            for (let i = 0; i < numOfComponents; i++) {
+                const x=Math.random()*300;
+                const y=Math.random()*250;
+                myGamePiece = new component(30, 30, "blue", x, y);
+                pieces.push(myGamePiece);
+                
+            }
+            myGameArea.start();
+        }
+        var myGameArea = {
+            canvas : document.createElement("canvas"),
+            start : function() {
+            this.canvas.id = "myGameCanvas";
+            this.canvas.width = 1000;
+            this.canvas.height = 700;
+            this.context = this.canvas.getContext("2d");
+            document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+            this.frameNo = 0;
+            this.interval = setInterval(updateGameArea, 20);
+            /*this.canvas.addEventListener('click', function () { var x = event.pageX,
+                        y = event.pageY;
+                        console.log(x)
+                        console.log(y) 
+                    }, false);      za odrediti pomak canvasa, u ovom slučaju 9 piksela    */  
+            this.canvas.addEventListener('click', function(){
+                var x= event.pageX - 9;
+                var y= event.pageY - 9;
+                for(i=0; i<numOfComponents; i++){
+                    if( ((pieces[i].x + pieces[i].width / 2) > x && (pieces[i].x - pieces[i].width / 2) < x) &&
+                            ((pieces[i].y + pieces[i].height / 2) > y && (pieces[i].y - pieces[i].height / 2) < y)
+                            ){
+                                pieces.splice(i,1);
+                                numOfComponents-=1;
+                                console.log(numOfComponents);
+                                destroyed++;
+                                break;
+                                
+                            }
+                }    
+            }, false)
+            },
+            stop : function() {
+            clearInterval(this.interval);
+            },
+            clear : function() {
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+            }
+
+    function component(width, height, color, x, y, type) {
+        this.type = type;
+        this.width = width;
+        this.height = height;
+        this.speed_x = 2;
+        this.speed_y = 2;
+        this.x = x;
+        this.y = y;
+        this.update = function() {
+        ctx = myGameArea.context;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.fillStyle = color;
+        ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
+        ctx.restore();
+        }
+        this.newPos = function() {
+        if (this.x - (this.width+9) / 2 < 0)  //<
+        this.speed_x = Math.floor(Math.random() * (5 - 0)) + 0 ;
+        else if ((this.x + this.width / 2) >= myGameArea.context.canvas.width)
+        this.speed_x =  Math.floor(Math.random() * (5 - (-7))) + (-7) ;              //this_speed_x=-2
+        if (this.y - (this.height+8) / 2 < 0)                                                      //this.speed_y = -2;
+        this.speed_y = Math.floor(Math.random() * (5 - (-10))) + (-10) ;
+        else if ((this.y + (this.height+8) / 2) >= myGameArea.context.canvas.height)
+        this.speed_y = Math.floor(Math.random() * (5 - 0)) + 0 ;
+        this.x += this.speed_x;
+        this.y -= this.speed_y;
+        }
+
+        }
+
+    function updateGameArea() {
+            myGameArea.clear();
+            for(let i = 0; i <pieces.length;i++){
+                pieces[i].newPos();
+                pieces[i].update();
+                
+            }
+           
+            let text1=`Targets roaming ${numOfComponents}`;
+            let text2=`Targets destroyed ${destroyed}`
+            ctx.font = "20px Comic Sans MS";
+            ctx.fillText(`Targets roaming:${numOfComponents}`,1000-ctx.measureText(text1).width, 30);
+            ctx.fillText(`Targets destroyed:${destroyed}`, 1000-ctx.measureText(text2).width, 50);
+
+            /*if(destroyed==startingNumber){
+                alert("Well done, all targets neutralized");
+                console.log("Game over!");
+                startingNumber=10;
+            }*/
+            }
+        
+        </script>   
+    <style>
+        canvas {
+        border:1px solid #000000;
+        background-color: #f1f1f1;
+        }
+        </style>
+</head>
+<body onload="startGame()">
+</body>
+</html>
